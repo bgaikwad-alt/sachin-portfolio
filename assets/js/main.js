@@ -82,5 +82,35 @@
     io2.observe(ask);
   }
 
+  // Lightbox for case-study galleries (images within one gallery cycle together)
+  const box = document.querySelector(".lightbox");
+  if (box && typeof box.showModal === "function") {
+    const img = box.querySelector("img");
+    const count = box.querySelector(".lightbox__count");
+    let list = [], idx = 0;
+    const show = (i) => {
+      idx = (i + list.length) % list.length;
+      const src = list[idx];
+      img.src = src.currentSrc || src.src;
+      img.alt = src.alt;
+      count.textContent = list.length > 1 ? (idx + 1) + " / " + list.length : "";
+    };
+    document.querySelectorAll(".gallery .zoom").forEach((btn) => {
+      btn.addEventListener("click", () => {
+        list = [...btn.closest(".gallery").querySelectorAll(".zoom img")];
+        show(list.indexOf(btn.querySelector("img")));
+        box.showModal();
+      });
+    });
+    box.querySelector(".lightbox__close").addEventListener("click", () => box.close());
+    box.querySelector(".lightbox__prev").addEventListener("click", () => show(idx - 1));
+    box.querySelector(".lightbox__next").addEventListener("click", () => show(idx + 1));
+    box.addEventListener("click", (e) => { if (e.target === box) box.close(); });
+    box.addEventListener("keydown", (e) => {
+      if (e.key === "ArrowRight") show(idx + 1);
+      if (e.key === "ArrowLeft") show(idx - 1);
+    });
+  }
+
   document.querySelectorAll("[data-year]").forEach((el) => (el.textContent = new Date().getFullYear()));
 })();
